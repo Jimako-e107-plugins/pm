@@ -45,7 +45,7 @@ class pm_url // plugin-folder + '_url'
 
 
 		$config['index'] = array(
-            'alias'         => 'pm',
+			'alias'         => 'pm',
 			'regex'			=> '^{alias}/?(.*)', 						// matched against url, and if true, redirected to 'redirect' below.
 			'sef'			=> '{alias}', 							// used by e107::url(); to create a url from the db table.
 			'redirect'		=> '{e_PLUGIN}pm/pm.php$1', 		// file-path of what to load when the regex returns true.

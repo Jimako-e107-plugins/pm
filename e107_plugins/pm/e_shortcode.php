@@ -34,42 +34,44 @@ class pm_shortcodes extends e_shortcode
 
 
 
-	function sc_pm_nav($parm='')
+function sc_pm_nav($parm='')
 	{
 		$tp = e107::getParser();
-
 		if(!isset($this->prefs['pm_class']) || !check_class($this->prefs['pm_class']))
 		{
 			return null;
 		}
-
 		$mbox = $this->pm->pm_getInfo('inbox');
+
+		// Accessible name for the toggle (the link otherwise exposes only an icon + number to screen readers).
+		$navLabel = defined('LAN_PLUGIN_PM_NAV') ? LAN_PLUGIN_PM_NAV : 'Private messages';
 
 		if(!empty($mbox['inbox']['new']))
 		{
 			$count = "<span class='label label-warning'>".$mbox['inbox']['new']."</span>";
-			$icon = $tp->toGlyph('fa-envelope');
+			$icon  = $tp->toGlyph('fa-envelope');
+			$aria  = $navLabel.', '.intval($mbox['inbox']['new']).' '
+			       . (defined('LAN_PLUGIN_PM_UNREAD') ? LAN_PLUGIN_PM_UNREAD : 'unread');
 		}
 		else
 		{
-			$icon = $tp->toGlyph('fa-envelope-o');
+			$icon  = $tp->toGlyph('fa-envelope-o');
 			$count = '';
+			$aria  = $navLabel;
 		}
 
+		$aria = $tp->toAttribute($aria);
 
-		$urlInbox = e107::url('pm','index','', array('query'=>array('mode'=>'inbox')));
-		$urlOutbox = e107::url('pm','index','', array('query'=>array('mode'=>'outbox')));
+		$urlInbox   = e107::url('pm','index','', array('query'=>array('mode'=>'inbox')));
+		$urlOutbox  = e107::url('pm','index','', array('query'=>array('mode'=>'outbox')));
 		$urlCompose = e107::url('pm','index','', array('query'=>array('mode'=>'send')));
-
-		return '<a class="pm-nav nav-link dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" data-bs-toggle="dropdown" href="#">'.$icon.$count.'</a>
+		return '<a class="pm-nav nav-link dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false" aria-label="'.$aria.'">'.$icon.$count.'</a>
 		<ul class="dropdown-menu dropdown-menu-end">
-		<li>
-			<a class="dropdown-item" href="'.$urlInbox.'">'.LAN_PLUGIN_PM_INBOX.'</a>
-			<a class="dropdown-item" href="'.$urlOutbox.'">'.LAN_PLUGIN_PM_OUTBOX.'</a>
-			<a class="dropdown-item" href="'.$urlCompose.'">'.LAN_PLUGIN_PM_NEW.'</a> 
+			<li><a class="dropdown-item" href="'.$urlInbox.'">'.LAN_PLUGIN_PM_INBOX.'</a></li>
+			<li><a class="dropdown-item" href="'.$urlOutbox.'">'.LAN_PLUGIN_PM_OUTBOX.'</a></li>
+			<li><a class="dropdown-item" href="'.$urlCompose.'">'.LAN_PLUGIN_PM_NEW.'</a></li>
 		</li>
 		</ul>';
-
 	}
 
 
@@ -113,13 +115,15 @@ class pm_shortcodes extends e_shortcode
 		    if(deftrue('FONTAWESOME') && deftrue('BOOTSTRAP'))
 		    {
 		        $img =  e107::getParser()->toGlyph($glyph,'');
-		        return  "<a class='".$class."' href='".$url ."'>{$img} ".LAN_USENDPRIVATEMSG." ".$userData['user_name']."</a>";
+		       // return  "<a class='".$class."' href='".$url ."'>{$img} ".LAN_USENDPRIVATEMSG." ".$userData['user_name']."</a>"; Core:
+				return  "<a class='".$class."' href='".$url ."'>{$img} ".LAN_PLUGIN_PM_NEW."</a>";
+
 		    }
 
 
 		    if(file_exists(THEME.'forum/pm.png'))
 		    {
-		           $img = "<img src='".THEME_ABS."forum/pm.png' alt='".LAN_PM."' title='".LAN_PM."' style='border:0' />";
+		           $img = "<img src='".THEME_ABS."forum/pm.png' alt='".LAN_PM."' title='".LAN_PM."' style='border:0' />";  
 		     }
 		     else
 		     {
